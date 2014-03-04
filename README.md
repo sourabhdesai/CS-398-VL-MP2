@@ -1,32 +1,10 @@
-CS398VL Project Skeleton
-================
-
-A project skeleton for CS398 VL (Visualizing Literature). This was initially created Spring 2014.
-
-A Quick Note about the License
------------------------------
-This repository is licensed under the MIT license, meaning you are free to do whatever you like with it. When you fork this repository, you can even change the license to be closed source, GPL, whatever. By default, though, the LICENSE.md file included indicates that your fork is also completely open source, and anyone else may modify it at will.
-
-
-Publishing
-----------
-You have several options for hosting your project. 
-
-### Engineering@Illinois Servers
-You can run the syncing script by typing `./sync.sh`, It will prompt you for some info. You may leave the hostname and destination folder as-is, but make sure your username is your Netid!
-
-If you choose to, you can have the script save these values in a file called `.config`. To change the values later you can either edit that file or delete it and run the script again.
-
-You may then access the site at http://web.engr.illinois.edu/~NETID/.
-
-### Github Pages
-This one is easy! You just need to create a `gh-pages` branch and Github will use that for hosting your site. Since you don't really need the `gh-pages branch` locally, you can use the following command to push master to gh-pages. This assumes origin is your fork, not the main repository.
-
-    git push origin master:gh-pages
-    
-Note that this will make all of the files available on the website, not just HTML and the like. This is in contrast to the Illinois server above.
-
-You can then access the site (after a short delay) at http://USERNAME.github.io/REPOSITORY_NAME
-
-### Amazon Web Services
-Coming soon!
+ This is a radial tree that represents the relations between words used in the book "Once and Future King".
+ The tree starts with a sentinel node labeled "root" in the center of the circle and branches outwards to the ten most common words in the corpus.
+ From these ten words, I used Wordnet to find all synonyms to each word that was also used in the corpus.
+ This was recursively repeated on for three levels of iteration. I could have gone longer but would have sacrificed the cleanliness of the tree.
+ To extract this data, I did not use the NLTK library. I decided I wanted to try out the Natural Module for Node.js. This module has a lot of similair features as NLTK. It has tokenization, porter stemming, stopwords removal, word distance calculation, phonetical analysis, and complete a complete WordNet interface.
+ It also made sense to use Javascript in the Natural Language analysis as I was dealing with JSON data right from the beginning so it was a much smoother transition to get the data into the format I wanted.
+ The biggest problem I had was in the fact that I had unintentionally made asynchronous calls. I was trying to access the data before it was done processing and there was no clear way of telling when it would be done. My HORRIBLE solution was to use a delay funcion to delay retrieving my data for a set period of time after which my data would undoubtedly be finished processing.
+ I enjoyed using this library as I know Javascript better than Python and now know a powerful tool I can use in Node.js applications.
+ You can view the code for this site at: https://github.com/sourabhdesai/CS-398-VL-MP2
+ The code for the NLP analysis is in the ["MP2_NodeApp"](https://github.com/sourabhdesai/CS-398-VL-MP2/MP2_NodeApp) directory which can be found from the root directory
