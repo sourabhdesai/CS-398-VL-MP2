@@ -1,55 +1,58 @@
 function main() {
     console.log("JS file loaded!");
-    d3.json('data/cindas_data.json', function(data) {
-        data = _.map(data, function(elem) {
-            return {name: elem.word, value: elem.freq};
-        });
-        histogram("#main", data);
+    d3.json('data/flare.json', function(data) {
+        radialtree("#main", data);
+        console.log(data);
     });
-
 }
-function histogram(id, data) {
+
+function radialtree(id, root) {
     // Get size of container and set some defaults.
-    var width = $(id).width() || 900;
-    var height = $(id).height() || 200;
+    var width = $("#main").width() || 900;
+    var height = $("#main").height() || 200;
 
-    // A few colors to mess with
-    var color = d3.scale.category10();
-    // Insert a new SVG element (our chart)
-    var chart = d3.select(id)
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
 
-    // this is our scale for the x-axis. We use this to scale the chart to
-    // the width of our space, regardless of the number of buckets.
-    var x = d3.scale.linear()
-            .domain([0, data.length])
-            .range([0, width]);
-    // We also want a scale for our y-axis so we can make the height of the bars
-    // relative to the largest bar in our dataset
-    var y = d3.scale.linear()
-            .domain([0, d3.max(data, function(d) { return d.value; })])
-            .range([0, height]);
+    var diameter = 960;
 
-    // The g elements represent a data point.
-    var g = chart.selectAll("g")
-            .data(data)
-            .enter()
-            .append("g");
+    var tree = d3.layout.tree()
+        .size([360, diameter / 2 - 120])
+        .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
 
-    // Each g element has a rectangle that is our bar
-    g.append("rect")
-        .attr("x", function(d, i) { return x(i);})
-        .attr("y", function(d) {return height - y(d.value) - 25;})
-        .style("fill", function(d, i) { return color(i); })
-        .attr("width", width/data.length)
-        .attr("height", function(d) { return y(d.value); });
+    var diagonal = d3.svg.diagonal.radial()
+        .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-    // and a text element describing the bar
-    g.append("text")
-        .attr("x", function(d, i) { return x(i) + width / data.length / 4;})
-        .attr("y", function(d) {return height - 5;})
-        .style("fill", "black")
-        .text(function(d) {return d.name; });
+    var svg = d3.select("#main").append("svg")
+        .attr("width", diameter)
+        .attr("height", diameter + 150)
+      .append("g")
+        .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+    console.log(root);
+    var nodes = tree.nodes(root),
+        links = tree.links(nodes);
+          // console.log(nodes);
+
+    var link = svg.selectAll(".link")
+          .data(links)
+        .enter().append("path")
+          .attr("class", "link")
+          .attr("d", diagonal);
+
+    var node = svg.selectAll(".node")
+          .data(nodes)
+        .enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
+
+    node.append("circle")
+          .attr("r", 4.5);
+
+    node.append("text")
+          .attr("dy", ".31em")
+          .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+          .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+          .text(function(d) { return d.name; });
+    
+
+    d3.select(self.frameElement).style("height", diameter - 150 + "px");
 }
